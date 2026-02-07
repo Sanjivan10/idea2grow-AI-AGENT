@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
@@ -7,17 +8,13 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      // Accessing GEMINI_API_KEY as requested for specific deployment environment
-      const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        throw new Error("GEMINI_API_KEY environment variable is not defined. Please verify your Netlify settings.");
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
+      // Fix: Use process.env.API_KEY directly for initialization as per @google/genai guidelines.
+      // This also resolves the TypeScript 'Property env does not exist on type ImportMeta' error.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        // Fix: Use gemini-3-pro-preview for complex strategic business reasoning tasks.
+        model: "gemini-3-pro-preview",
         contents: [
           ...history,
           { role: 'user', parts: [{ text: prompt }] }
@@ -26,13 +23,15 @@ export class GeminiService {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
           temperature: 0.4,
+          // Disable thinking budget to ensure lightning-fast responses as requested by the persona.
           thinkingConfig: { thinkingBudget: 0 }
         },
       });
 
+      // Fix: Access the .text property directly (not as a method) as per guidelines.
       const text = response.text || "I'm sorry, I couldn't generate a response.";
       
-      // Extract grounding metadata for sources from Google Search
+      // Extract grounding metadata for sources from Google Search as required for search grounding.
       const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       const sources = groundingChunks
         .map((chunk: any) => ({
