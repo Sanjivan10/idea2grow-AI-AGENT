@@ -26,7 +26,6 @@ const App: React.FC = () => {
   }, [state.messages, isStarted, state.isLoading]);
 
   useEffect(() => {
-    // Focus input on initial load or return to landing
     if (!isStarted) {
       inputRef.current?.focus();
     }
@@ -79,7 +78,7 @@ const App: React.FC = () => {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: "Our strategic sensors encountered an error. Please refresh or try another query.",
+        error: "Strategic sensor error: Please ensure the 'API_KEY' environment variable is correctly configured in your deployment settings.",
       }));
     }
   };
@@ -87,7 +86,6 @@ const App: React.FC = () => {
   const renderMessageContent = (content: string) => {
     return content.split('\n').map((line, i) => {
       let styledLine = line;
-      // Simple bold markdown
       styledLine = styledLine.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
       
       if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {

@@ -1,22 +1,24 @@
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
+/**
+ * GeminiService handles all interactions with the Google GenAI SDK.
+ * Note: The API key must be obtained exclusively from process.env.API_KEY.
+ * For Netlify deployments, please ensure you map your GEMINI_API_KEY to API_KEY 
+ * in your site's environment variable settings.
+ */
 export class GeminiService {
-  private getAIInstance() {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      throw new Error("API_KEY environment variable is not defined.");
-    }
-    return new GoogleGenAI({ apiKey });
-  }
-
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      const ai = this.getAIInstance();
+      if (!process.env.API_KEY) {
+        throw new Error("API_KEY environment variable is not defined.");
+      }
+      
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash",
+        model: "gemini-3-flash-preview",
         contents: [
           ...history,
           { role: 'user', parts: [{ text: prompt }] }
