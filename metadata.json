@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Idea2Grow AI Assistant",
+  "description": "A sophisticated AI agent designed to survey idea2grow.com and provide summarized business insights, blog details, and real-time web searches with video recommendations.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
