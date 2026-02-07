@@ -1,8 +1,7 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Message, Role, ChatState } from './types';
 import { geminiService } from './services/geminiService';
-import { Logo, COLORS } from './constants';
+import { Logo } from './constants';
 
 const App: React.FC = () => {
   const [state, setState] = useState<ChatState>({
@@ -78,7 +77,7 @@ const App: React.FC = () => {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: "Strategic sensor error: Please ensure the 'API_KEY' environment variable is correctly configured in your deployment settings.",
+        error: `Deployment Config Error: ${err.message || "Failed to reach strategic services. Please verify your environment variables."}`,
       }));
     }
   };
@@ -107,14 +106,13 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-green-100 flex flex-col items-center">
-      {/* Dynamic Background */}
+      {/* Visual background layers */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#8BD658]/5 rounded-full blur-[120px]"></div>
         <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#3F6EC9]/5 rounded-full blur-[120px]"></div>
       </div>
 
       {!isStarted ? (
-        /* LANDING VIEW */
         <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-5xl px-6 min-h-screen animate-slide-in">
           <div className="mb-12 flex flex-col items-center text-center">
             <div className="p-4 mb-8 bg-white/50 rounded-3xl border border-slate-50 shadow-sm">
@@ -175,7 +173,6 @@ const App: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* CHAT VIEW */
         <div className="relative z-10 flex flex-col w-full max-w-5xl h-screen px-4 md:px-8">
           <header className="py-6 flex items-center justify-between border-b border-slate-50 bg-white/50 backdrop-blur-md sticky top-0 z-20">
             <div 
@@ -279,7 +276,7 @@ const App: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Persistent Search Bar */}
+          {/* User query interface */}
           <div className="fixed bottom-0 left-0 right-0 p-8 md:p-12 pointer-events-none">
             <div className="max-w-3xl mx-auto w-full pointer-events-auto">
               <div className="relative group">
