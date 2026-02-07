@@ -4,21 +4,23 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 /**
  * GeminiService handles all interactions with the Google GenAI SDK.
  * 
- * Note: The API key must be obtained exclusively from process.env.API_KEY.
- * This is a requirement for the platform's secure key management and 
- * injection system.
+ * Secure API Management:
+ * The API key is obtained exclusively from process.env.API_KEY.
+ * This variable is pre-configured and injected by the environment 
+ * to ensure secure and valid access to Google's Generative AI services.
  */
 export class GeminiService {
+  /**
+   * Generates a strategic response using the Gemini API.
+   * Leverages Google Search grounding for real-time site-specific data.
+   */
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      /**
-       * Initialization follows the mandatory pattern for this environment:
-       * new GoogleGenAI({ apiKey: process.env.API_KEY })
-       */
-      const ai = new GoogleGenAI({ apiKey: 'AIzaSyBZK3H3fZm4uJ5J-8Tm8-2O-cYDnxdZmE' });
+      // Always initialize with process.env.API_KEY as per platform security standards.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
-        // Using gemini-3-pro-preview for complex strategic business reasoning
+        // Utilizing gemini-3-pro-preview for advanced reasoning and complex strategic analysis.
         model: "gemini-3-pro-preview",
         contents: [
           ...history,
@@ -28,15 +30,15 @@ export class GeminiService {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
           temperature: 0.4,
-          // Optimize for speed by setting thinking budget to 0
+          // Optimization: Disable thinking budget to ensure immediate summarized feedback for the user.
           thinkingConfig: { thinkingBudget: 0 }
         },
       });
 
-      // The .text property returns the extracted string output directly
-      const text = response.text || "I'm sorry, I couldn't generate a response.";
+      // Extract generated text directly from the response object's .text property.
+      const text = response.text || "I'm sorry, I couldn't generate a response at this moment.";
       
-      // Extract grounding metadata for sources from Google Search
+      // Extract grounding metadata to provide verifiable business sources from Google Search.
       const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       const sources = groundingChunks
         .map((chunk: any) => ({
@@ -47,7 +49,7 @@ export class GeminiService {
 
       return { text, sources };
     } catch (error) {
-      console.error("Strategic Service Error:", error);
+      console.error("Idea2Grow Strategic Intelligence Service Error:", error);
       throw error;
     }
   }
