@@ -8,10 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        body, html, #root {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
-            scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
         }
         .no-scrollbar::-webkit-scrollbar {
@@ -22,7 +26,7 @@
             scrollbar-width: none;
         }
         @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         @keyframes gradientFlow {
@@ -31,10 +35,11 @@
             100% { background-position: 0% 50%; }
         }
         .animate-slide-in {
-            animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .animate-gradient-flow {
-            animation: gradientFlow 6s ease infinite;
+            background-size: 200% 200%;
+            animation: gradientFlow 5s ease infinite;
         }
     </style>
 <script type="importmap">

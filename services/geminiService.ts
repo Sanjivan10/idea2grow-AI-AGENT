@@ -3,20 +3,15 @@ import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
 /**
- * GeminiService: High-Performance Advisor for Idea2Grow.
+ * GeminiService: High-Performance Strategic Engine for Idea2Grow.
  * 
- * Secure Deployment Architecture:
- * - API Key is retrieved EXCLUSIVELY via process.env.API_KEY (platform-managed).
- * - Model: 'gemini-3-flash-preview' for instant strategic synthesis.
- * - Thinking Budget: 0 for minimal latency.
+ * Optimized for Speed and Intelligence:
+ * - Model: 'gemini-3-flash-preview' for industry-leading speed.
+ * - Tools: 'googleSearch' for real-time web grounding.
  */
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      /**
-       * Crucial: We use the platform-provided process.env.API_KEY.
-       * Do not hardcode keys in source code for production security.
-       */
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
@@ -28,24 +23,24 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.5,
-          thinkingConfig: { thinkingBudget: 0 } // Optimization for rapid response
+          temperature: 0.4, // Slightly lower temperature for more focused, efficient answers
         },
       });
 
-      const text = response.text || "I apologize, I was unable to synthesize the requested insight. Please clarify your vision.";
+      const text = response.text || "I apologize, but I couldn't process that insight right now. Please try again.";
       
+      // Extract grounding sources
       const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       const sources = groundingChunks
         .map((chunk: any) => ({
-          title: chunk.web?.title || "Strategic Resource",
+          title: chunk.web?.title || "Source",
           uri: chunk.web?.uri || ""
         }))
         .filter((s: any) => s.uri !== "");
 
       return { text, sources };
     } catch (error: any) {
-      console.error("Idea2Grow Intelligence Engine Failure:", error);
+      console.error("Idea2grow Engine Error:", error);
       throw error;
     }
   }

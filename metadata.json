@@ -1,7 +1,5 @@
 {
-  "name": "Copy of Idea2Grow AI Assistant",
-  "description": "A sophisticated AI agent designed to survey idea2grow.com and provide summarized business insights, blog details, and real-time web searches with video recommendations.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "name": "Idea2Grow Strategic AI Assistant",
+  "description": "A high-performance intelligence agent specializing in surveying idea2grow.com for business insights and fallback real-time web search.",
+  "requestFramePermissions": []
 }
