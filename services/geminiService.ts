@@ -12,6 +12,7 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
+      // Re-initialize inside the call to ensure the latest API_KEY from process.env is used.
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
@@ -23,20 +24,26 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.4, // Slightly lower temperature for more focused, efficient answers
+          temperature: 0.2, // Lower temperature for more deterministic and faster extraction
         },
       });
 
-      const text = response.text || "I apologize, but I couldn't process that insight right now. Please try again.";
+      const text = response.text || "I'm sorry, I couldn't generate a strategic insight at this moment. Please try again.";
       
-      // Extract grounding sources
-      const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      const sources = groundingChunks
-        .map((chunk: any) => ({
-          title: chunk.web?.title || "Source",
-          uri: chunk.web?.uri || ""
-        }))
-        .filter((s: any) => s.uri !== "");
+      // Extract grounding sources with deduplication
+      const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+      const sourcesMap = new Map();
+      
+      rawChunks.forEach((chunk: any) => {
+        if (chunk.web && chunk.web.uri && chunk.web.title) {
+          sourcesMap.set(chunk.web.uri, {
+            title: chunk.web.title,
+            uri: chunk.web.uri
+          });
+        }
+      });
+
+      const sources = Array.from(sourcesMap.values());
 
       return { text, sources };
     } catch (error: any) {
