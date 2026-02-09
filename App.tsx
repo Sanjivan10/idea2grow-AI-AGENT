@@ -43,7 +43,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask a strategic growth question..."
+          placeholder="What's your next big idea?"
           aria-label="Search input"
           className="flex-1 bg-transparent border-none focus:ring-0 text-[16px] md:text-[17px] py-1 outline-none text-slate-800 placeholder:text-slate-400 font-normal resize-none overflow-y-auto no-scrollbar"
         />
@@ -53,10 +53,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <div className="flex items-center gap-2">
           <button 
             type="button"
-            onClick={() => handleSend("Give me a site analysis of idea2grow.com")}
+            onClick={() => handleSend("Analyze growth opportunities for idea2grow.com")}
             className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:bg-slate-50 rounded-full transition-colors text-[11px] font-bold uppercase tracking-wider border border-slate-100"
           >
-            Site Analysis
+            Growth Strategy
           </button>
         </div>
 
@@ -89,7 +89,7 @@ const WelcomeScreen: React.FC<{
   const suggestions = [
     { label: "Business Scaling", prompt: "How do I scale a small business efficiently?" },
     { label: "Marketing Insights", prompt: "What are the latest digital marketing trends for 2024?" },
-    { label: "Growth Strategy", prompt: "What are the top 3 strategies for brand growth right now?" }
+    { label: "Innovation Tips", prompt: "Give me 3 innovative ideas to grow my brand visibility." }
   ];
 
   return (
@@ -204,17 +204,17 @@ const App: React.FC = () => {
       setState(prev => ({ 
         ...prev, 
         isLoading: false, 
-        error: err.message || "The engine encountered a technical error. Please check your connection and API settings."
+        error: err.message || "An unexpected error occurred. Please check your API configuration."
       }));
     }
   };
 
   const renderMessageContent = (content: string) => {
     return content.split('\n').map((line, i) => {
-      // Bold markdown formatting
+      // Bold markdown replacement
       const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
       
-      // List handling
+      // List items
       if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
         const listContent = styledLine.trim().substring(2);
         return (

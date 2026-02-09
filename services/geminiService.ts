@@ -2,19 +2,20 @@ import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
 /**
- * GeminiService: Strategic Intelligence Engine for Idea2Grow.
+ * GeminiService: High-Performance Strategic Engine for Idea2Grow.
  * 
  * Optimized for Speed and Intelligence:
  * - Model: 'gemini-3-flash-preview' for industry-leading speed.
- * - Tools: 'googleSearch' for real-time web grounding and site-specific search.
+ * - Tools: 'googleSearch' for real-time web grounding.
  */
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      // Create a fresh instance for each call to ensure the latest API_KEY from environment is used
+      // The API key must be named 'API_KEY' in your environment settings (Vercel/Netlify/Local).
       const apiKey = process.env.API_KEY;
+      
       if (!apiKey || apiKey.length < 10) {
-        throw new Error("Invalid or missing API key. Please check your .env or Vercel settings.");
+        throw new Error("Missing API_KEY. Please add a variable named 'API_KEY' in your deployment settings.");
       }
 
       const ai = new GoogleGenAI({ apiKey });
@@ -28,20 +29,20 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.1, // Highly focused for strategic consistency
+          temperature: 0.1, // Set to low for highly focused strategic advice
         },
       });
 
-      const text = response.text || "I apologize, but I couldn't generate a strategic insight at this moment. Please try again.";
+      const text = response.text || "I apologize, but I encountered an error generating your growth insight. Please try again.";
       
       // Extract grounding sources with deduplication
       const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       const sourcesMap = new Map();
       
       rawChunks.forEach((chunk: any) => {
-        if (chunk.web && chunk.web.uri) {
+        if (chunk.web && chunk.web.uri && chunk.web.title) {
           sourcesMap.set(chunk.web.uri, {
-            title: chunk.web.title || 'Source',
+            title: chunk.web.title,
             uri: chunk.web.uri
           });
         }
@@ -51,11 +52,7 @@ export class GeminiService {
 
       return { text, sources };
     } catch (error: any) {
-      console.error("Idea2grow Engine Error:", error);
-      // Propagate a descriptive error for the UI
-      if (error.message?.includes('403')) {
-        throw new Error("API Key Error (403): The growth engine is not authorized. Check your project billing/API limits.");
-      }
+      console.error("Idea2grow Strategic Engine Error:", error);
       throw error;
     }
   }
