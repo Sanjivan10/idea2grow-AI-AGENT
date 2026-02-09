@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_INSTRUCTION } from "../constants";
 
@@ -12,7 +11,7 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      // Re-initialize inside the call to ensure the latest API_KEY from process.env is used.
+      // The API key is obtained directly from process.env.API_KEY as per the environment configuration.
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
@@ -24,11 +23,11 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.2, // Lower temperature for more deterministic and faster extraction
+          temperature: 0.1, // Set to low for highly focused strategic advice
         },
       });
 
-      const text = response.text || "I'm sorry, I couldn't generate a strategic insight at this moment. Please try again.";
+      const text = response.text || "I apologize, but I encountered an error generating your growth insight. Please try again.";
       
       // Extract grounding sources with deduplication
       const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
@@ -47,7 +46,7 @@ export class GeminiService {
 
       return { text, sources };
     } catch (error: any) {
-      console.error("Idea2grow Engine Error:", error);
+      console.error("Idea2grow Strategic Engine Error:", error);
       throw error;
     }
   }
