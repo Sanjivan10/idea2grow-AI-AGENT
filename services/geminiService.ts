@@ -11,7 +11,7 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      // The API key is obtained directly from process.env.API_KEY as per the environment configuration.
+      // The API key is obtained directly from process.env.API_KEY.
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       const response = await ai.models.generateContent({
@@ -23,20 +23,20 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.1, // Set to low for highly focused strategic advice
+          temperature: 0.2, 
         },
       });
 
-      const text = response.text || "I apologize, but I encountered an error generating your growth insight. Please try again.";
+      const text = response.text || "I apologize, but I couldn't generate a response. Please try again.";
       
-      // Extract grounding sources with deduplication
+      // Extract grounding sources from the response metadata
       const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       const sourcesMap = new Map();
       
       rawChunks.forEach((chunk: any) => {
-        if (chunk.web && chunk.web.uri && chunk.web.title) {
+        if (chunk.web && chunk.web.uri) {
           sourcesMap.set(chunk.web.uri, {
-            title: chunk.web.title,
+            title: chunk.web.title || 'Source',
             uri: chunk.web.uri
           });
         }

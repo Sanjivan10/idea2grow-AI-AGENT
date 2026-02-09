@@ -52,6 +52,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <div className="flex items-center justify-between px-5 pb-3 mt-1">
         <div className="flex items-center gap-2">
           <button 
+            type="button"
             onClick={() => handleSend("Analyze growth opportunities")}
             className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:bg-slate-50 rounded-full transition-colors text-[12px] font-semibold"
           >
@@ -61,6 +62,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
         <div className="flex items-center gap-1">
           <button 
+            type="button"
             onClick={() => handleSend()}
             disabled={isLoading || !input.trim()}
             className="p-2 text-slate-400 hover:text-slate-900 disabled:opacity-20 transition-all active:scale-95"
@@ -116,6 +118,7 @@ const WelcomeScreen: React.FC<{
           {suggestions.map((s, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => handleSend(s.prompt)}
               className="px-4 py-2 rounded-full bg-white text-slate-600 text-[13px] font-medium border border-slate-200 hover:border-slate-400 hover:shadow-sm transition-all"
             >
@@ -198,22 +201,40 @@ const App: React.FC = () => {
       }));
     } catch (err: any) {
       console.error(err);
+      const errorMessage = err.message?.includes('403') 
+        ? "Access Denied: Please check if your API Key is active and configured correctly."
+        : "Growth Engine Offline: We encountered a technical issue. Please check your connection and try again.";
+      
       setState(prev => ({ 
         ...prev, 
         isLoading: false, 
-        error: "Engine timeout. Please check your API configuration or network." 
+        error: errorMessage
       }));
     }
   };
 
   const renderMessageContent = (content: string) => {
     return content.split('\n').map((line, i) => {
-      let styledLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
+      // Bold text replacement
+      const styledLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
+      
+      // List items
       if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
-        return <li key={i} className="ml-5 mb-2 list-disc text-slate-700 leading-relaxed text-[15px]" dangerouslySetInnerHTML={{ __html: styledLine.trim().substring(2) }} />;
+        const listContent = styledLine.trim().substring(2);
+        return (
+          <li key={i} className="ml-5 mb-2 list-disc text-slate-700 leading-relaxed text-[15px]">
+            <span dangerouslySetInnerHTML={{ __html: listContent }} />
+          </li>
+        );
       }
+      
+      // Empty lines
       if (!line.trim()) return <div key={i} className="h-4" />;
-      return <p key={i} className="mb-3 text-slate-700 leading-relaxed text-[15px]" dangerouslySetInnerHTML={{ __html: styledLine }} />;
+      
+      // Regular paragraphs
+      return (
+        <p key={i} className="mb-3 text-slate-700 leading-relaxed text-[15px]" dangerouslySetInnerHTML={{ __html: styledLine }} />
+      );
     });
   };
 
@@ -235,6 +256,7 @@ const App: React.FC = () => {
           <span className="font-extrabold text-sm uppercase tracking-widest text-slate-900">Idea2grow</span>
         </div>
         <button 
+          type="button"
           onClick={() => { setIsStarted(false); setState({ messages: [], isLoading: false, error: null }); }}
           className="text-[10px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-widest transition-colors"
         >
@@ -277,8 +299,8 @@ const App: React.FC = () => {
           )}
 
           {state.error && (
-            <div className="mx-auto flex flex-col items-center gap-4 p-8 bg-slate-50 border border-slate-100 rounded-3xl">
-              <p className="text-[13px] font-bold text-slate-800 text-center uppercase tracking-widest">{state.error}</p>
+            <div className="mx-auto flex flex-col items-center gap-4 p-8 bg-red-50/50 border border-red-100 rounded-3xl">
+              <p className="text-[13px] font-bold text-red-800 text-center uppercase tracking-widest">{state.error}</p>
               <button onClick={() => handleSend(lastInput)} className="text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-colors">Try Again</button>
             </div>
           )}
