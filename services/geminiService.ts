@@ -11,11 +11,11 @@ import { SYSTEM_INSTRUCTION } from "../constants";
 export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, parts: { text: string }[] }[]) {
     try {
-      // The API key must be named 'API_KEY' in your environment settings (Vercel/Netlify/Local).
-      const apiKey = process.env.API_KEY;
+      // Get key and trim any accidental whitespace
+      const apiKey = (process.env.API_KEY || "").trim();
       
       if (!apiKey || apiKey.length < 10) {
-        throw new Error("Missing API_KEY. Please add a variable named 'API_KEY' in your deployment settings.");
+        throw new Error("Missing or invalid API_KEY. Please ensure you've added 'API_KEY' to your deployment environment variables.");
       }
 
       const ai = new GoogleGenAI({ apiKey });
@@ -29,7 +29,7 @@ export class GeminiService {
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
-          temperature: 0.1, // Set to low for highly focused strategic advice
+          temperature: 0.1,
         },
       });
 
@@ -53,6 +53,10 @@ export class GeminiService {
       return { text, sources };
     } catch (error: any) {
       console.error("Idea2grow Strategic Engine Error:", error);
+      // More descriptive errors for the UI
+      if (error.message?.includes('403')) {
+        throw new Error("Growth Engine Unauthorized (403): Please verify your API Key is active in the Google AI Studio console.");
+      }
       throw error;
     }
   }
